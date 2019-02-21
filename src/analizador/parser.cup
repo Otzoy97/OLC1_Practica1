@@ -1,13 +1,45 @@
 package analizador;
 
 import java_cup.runtime.Symbol;
+import graficador.Variable;
+import java.util.LinkedList;
 
 parser code {:
+    public LinkedList<Variable> listaVariable = new LinkedList();
+    public LinkedList<Grafica> listaGrafica = new LinkedList();
+    public Linkedist<Galeria> listaGaleria = new LinkedList();
+
     public void syntax_error (Symbol s){
         Scanner.Err += "Leve. Línea " + s.right + ", Columna " + s.left + ". Identificador " + s.value;
     }
     public void unrecovered_syntax_error(Symbol s){ 
         Scanner.Err += "Grave. Línea " + s.right + ", Columna " + s.left + ". Identificador " + s.value;
+    }
+    /**
+     * @param idVar identificador de la variable buscar
+     * return valor doble que se identificó
+     */
+    public double getValue(String idVar){
+        double cifra = 0;
+        for(Variable var : listaVariable){
+            if(var.getNombre().equals(idVar)){
+                valor = var.getCifra();
+            }
+        }
+        return cifra;
+    }
+    /**
+     * @param idVar identificador de la variable buscar
+     * return cadena que se identificó
+     */
+    public String getString(String idVar){
+        String valor = "";
+        for(Variable var : listaVariable){
+            if(var.getNombre().equals(idVar)){
+                valor = var.getTexto();
+            }
+        }
+        return valor;
     }
 :}
 
@@ -25,7 +57,7 @@ terminal String MAS, MENOS, PRODUCTO, DIVISION;
 //VARIABLES
 terminal String DEFINIR, STRING,INT;
 //LETRAS Y NUMEROS
-terminal String CADENA, IDENTIFICADOR, ENTERO;
+terminal String CADENA, IDENTIFICADOR,  ENTERO;
 //GRAFICAS
 terminal String GRAFICABARRAS, GRAFICALINEAS;
 //GRAFICABARRAS
@@ -36,17 +68,23 @@ terminal String DEFINIRXYLINE, NOMBRE, COLOR, GROSOR, PUNTOS;
 terminal String GALERIA;
 /*No Terminales*/
 non terminal String INICIO;
-//A, E
-non terminal String A, E;
-//BODYS, GraficaBarras, Grafica Lineas, Galeria
-non terminal String  BODY, GB, GL, GG;
+//Definición de variables y operatoria de enteros
+non terminal String DEFVAR, DEFOPER;
+non terminal String VARSTR, VARINT;
+//BODYS
+non terminal String  BODY, SUBBODY;
+//GraficaBarras, Grafica Lineas, Galeria
+non terminal String GRAPHBAR, GRPAHLINE, GALGAL;
 //GraficaBarras B (BODYBARRAS), L (LABELS), EJX (EJEX), EJY (EJEY), PXY (PUNTOSXY)
-non terminal String B, L, EJX, EJY, PXY;
+non terminal String BODYBARRAS, EJX, EJY, PXY;
+non terminal String SUBBODYBARRAS, GBVARSTR, GBVARINT;
+non terminal String SUBPXY;
 //GraficaLineas C (BODYLINEAS), LL (LABELS), XYL (DEFINIRXYLINE), PXYL (PUNTOSXYL)
-non terminal String C, LL, XYL, PXYL;
+non terminal String BODYLINEAS, LABELLINEAS, XYL, PXYL;
+non terminal String SUBBODYLINEAS, GLVARSTR, GLVARINT, SUBPXYL;
 //Galeria G(BODYGALERAS), DIR (DIRECCION), GID (GRAFICASID)
-non terminal String G, DIR , GID;
-non terminal SUBINICIO;
+non terminal String GAL, DIR , GID, SUBGID;
+//non terminal SUBINICIO;
 /*Precedencia*/
 precedence left MAS, MENOS;
 precedence left PRODUCTO, DIVISION;
@@ -54,49 +92,249 @@ precedence left PRODUCTO, DIVISION;
 start with INICIO;
 
 ///----------------------------------------------------------
-INICIO::= DEFINIR:a ABRIR_LLAVE A:b CERRAR_LLAVE //BODY:c GG:d
+INICIO::= DEFINIR:a ABRIR_LLAVE A:b CERRAR_LLAVE BODY:c GALGAL:d
 {:
-    System.out.println( (RESULT=a+"{"+b+"}" /*+ c + d*/) );
+    //System.out.println( (RESULT=a+"{"+b+"}" /*+ c + d*/) );
 :};
-///----------------------------------------------------------
-A::= A:a STRING IDENTIFICADOR:b IGUAL CADENA:c SEMICOLON
+///--------------------DEFICINICIÓN DE VARIABLES--------------------------
+DEFVAR::= DEFVAR:a STRING IDENTIFICADOR:b IGUAL CADENA:c SEMICOLON
 {:
-    System.out.println( (RESULT=a+"\n"+"string "+b+" = "+c+";") );
+    //System.out.println( (RESULT=a+"\n"+"string "+b+" = "+c+";") );
+    //RESULT = a;
+    listaVariable.add(new Variable("string",b,c));
 :} 
-| A:a INT IDENTIFICADOR:b IGUAL E:c SEMICOLON
+| DEFVAR:a INT IDENTIFICADOR:b IGUAL E:c SEMICOLON
 {:
-    System.out.println( (RESULT=a+"\n"+"int "+b+" = "+c+";") );
+    //System.out.println( (RESULT=a+"\n"+"int "+b+" = "+c+";") );
+    //RESULT =a;
+    listaVariable.add(new Variable("int",b,Double.parseDouble(c+"")));
 :}
 | STRING IDENTIFICADOR:b IGUAL CADENA:c SEMICOLON
 {:
-    System.out.println( (RESULT="string "+b+" = "+c+";") );
+    //System.out.println( (RESULT="string "+b+" = "+c+";") );
+    listaVariable.add(new Variable("string",b,c));
 :} 
 | INT IDENTIFICADOR:b IGUAL E:c SEMICOLON
 {:
-    System.out.println( (RESULT="int "+b+" = "+c+";") );
+    //System.out.println( (RESULT="int "+b+" = "+c+";") );
+    listaVariable.add(new Variable("int",b,Double.parseDouble(c+"")));
 :};
-//----------------------------------------------------------
-E::= E:a MAS E:b
+///---------------------OPERATORIA-----------------
+DEFOPER::= DEFOPER:a MAS DEFOPER:b
 {:
-    System.out.println( (RESULT=a+"+"+b) );
+    RESULT=String.valueOf(Double.parseDouble(a+"")+Double.parseDouble(b+""));
 :}
-| E:a PRODUCTO E:b
+| DEFOPER:a PRODUCTO DEFOPER:b
 {:
-    System.out.println( (RESULT=a+"*"+b) );
+    RESULT=String.valueOf(Double.parseDouble(a+"")*Double.parseDouble(b+""));
 :}
-| E:a MENOS E:b
+| DEFOPER:a MENOS DEFOPER:b
 {:
-    System.out.println( (RESULT=a+"-"+b) );
+    RESULT=String.valueOf(Double.parseDouble(a+"")-Double.parseDouble(b+""));
 :}
-| E:a DIVISION E:b
+| DEFOPER:a DIVISION DEFOPER:b
 {:
-    System.out.println( (RESULT=a+"/"+b) );
+    RESULT=String.valueOf(Double.parseDouble(a+"")/Double.parseDouble(b+""));
 :}
-| ABRIR_PARENTESIS E:a CERRAR_PARENTESIS
+| ABRIR_PARENTESIS DEFOPER:a CERRAR_PARENTESIS
 {:
-    RESULT = "("+a+")";
+    RESULT = a;
 :}
 | ENTERO:a 
 {:
     RESULT = a;
+:};
+///-----------------CUERPO DEL PROGRAMA------------------------
+BODY::= BODY SUBBODY
+{:
+:}
+| SUBBODY 
+{:
+:};
+SUBBODY::= GRAPHBAR
+{:
+:}
+| GRAPHLINE 
+{:
+:};
+///----------------------GRAFICO DE BARRAS----------------------
+GRAPHBAR::= GRAFICABARRAS ABRIR_LLAVE BODYBARRAS CERRAR_LLAVE
+{:
+:};
+///CUERPO PRINCIPAL
+BODYBARRAS::= BODYBARRAS:a SUBBODYBARRAS:a
+{:
+:}
+| SUBBODYBARRAS:a
+{:
+:};
+///INSTRUCCIONES OBLIGATORIAS
+SUBBODYBARRAS::= ID COLON GBVARSTR:a SEMICOLON 
+{:
+:}
+| TITULO COLON GBVARSTR:a SEMICOLON 
+{:
+:}
+| TITULOX COLON GBVARSTR:a SEMICOLON 
+{:
+:}
+| TITULOY COLON GBVARSTR:a SEMICOLON 
+{:
+:}
+| EJEY COLON ABRIR_CORCHETE EJY:a CERRAR_CORCHETE SEMICOLON
+{:
+:}
+| EJEX COLON ABRIR_CORCHETE EJX:a CERRAR_CORCHETE 
+{:
+:}
+| PUNTOSXY COLON ABRIR_CORCHETE PXY:a CERRAR_CORCHETE 
+{:
+:};
+///EJE Y
+EJY::= EJY:a COMA GBVARINT:b
+{:
+:}
+| GBVARINT:a
+{:
+:};
+//EJE X
+EJX::=EJX:a COMA GBVARSTR:b
+{:
+:}
+| GBVARSTR:a
+{:
+:};
+///PUNTOS XY
+PXY::= PXY:a COMA SUBPXY:b
+{:
+:}
+| SUBPXY
+{:
+:};
+SUBPXY::= ABRIR_LLAVE GBVARINT:a COMA GBVARINT:a CERRAR_LLAVE
+{:
+:}
+///ENTERO O VARIABLE
+GBVARSTR::= IDENTIFICADOR:a
+{:
+    RESULT = getString(a);
+:}
+| CADENA:a
+{:
+    RESULT = a;
+:};
+///CADENA O VARIABLE
+GBVARINT::= IDENTIFICADOR:a
+{:
+    RESULT = getCifra(a);
+:}
+| DEFOPER:a
+{:
+    RESULT = a;
+:};
+///---------------------GRAFICO DE LINEAS ----------------------
+GRAPHLINE::= GRAFICALINEAS ABRIR_LLAVE BODYLINEAS:a CERRAR_LLAVE
+{:
+:};
+///CUERPO PRINCIPAL
+BODYLINEAS::= BODYLINEAS:a SUBBODYLINEAS:b
+{:
+:}
+| SUBBODYLINEAS:a
+{:
+:};
+///INSTRUCCIONES OBLIGATORIAS
+SUBBODYLINEAS::= ID COLON GLVARSTR:a SEMICOLON 
+{:
+:}
+| TITULO COLON GLVARSTR:a SEMICOLON 
+{:
+:}
+| TITULOX COLON GLVARSTR:a SEMICOLON
+{:
+:}
+| TITULOY COLON GLVARSTR:a SEMICOLON
+{:
+:}
+| DEFINIRXYLINE ABRIR_INTERROGACION XYL:a CERRAR_INTERROGACION
+{:
+:};
+////XYL
+XYL::= XYL:a SUBXYL:b
+{:
+:}
+| SUBXYL:a
+{:
+:};
+SUBXYL::= NOMBRE COLON GLVARSTR:a SEMICOLON
+{:
+:}
+| COLOR COLON GLVARSTR:a SEMICOLON
+{:
+:}
+| GROSOR COLON GLVARINT:a SEMICOLON 
+{:
+:}
+| PUNTOS COLON ABRIR_CORCHETE PXYL:a CERRAR_CORCHETE SEMICOLON
+{:
+:};
+///PXYL
+PXYL::= PXYL:a COMA SUBPXYL:b
+{:
+:}
+| SUBPXYL:a
+{:
+:};
+SUBPXYL::= ABRIR_LLAVE GLVARINT:a COMA GLVARINT:b CERRAR_LLAVE
+{:
+:};
+//GLVARINT
+GLVARINT::= IDENTIFICADOR:a
+{:
+    RESULT = getCifra(a);
+:}
+| DEFOPER:a 
+{:
+    RESULT = a;
+:};
+//GLVARSTR
+GLVARSTR::= IDENTIFICADOR:a
+{:
+    RESULT = getString(a);
+:}
+| CADENA:a
+{:
+    RESULT = a;
+:};
+///--------------------- GALERIA ----------------------
+GALGAL::= GALERIA ABRIR_LLAVE GAL:a CERRAR_LLAVE
+{:
+:};
+GAL::= GAL:a GALERIA ABRIR_PARENTESIS DIR:b COMA GID:c CERRAR_PARENTESIS SEMICOLON
+{:
+:}
+| GALERIA ABRIR_PARENTESIS SUBGAL:a CERRAR_PARENTESIS SEMICOLON
+{:
+:};
+DIR::= CADENA:a
+{:
+    RESULT = a;
+:}
+| IDENTIFICADOR:a
+{:
+    RESULT = getString(a);
+:};
+GID::= GID:a COMA SUBGID:b
+{:
+:}
+| SUBGID:a
+{:
+:};
+SUBGID:: = CADENA:a
+{:
+    RESULT = a;
+:}
+| IDENTIFICADOR:a
+{:
+    RESULT = getString(a);
 :};
