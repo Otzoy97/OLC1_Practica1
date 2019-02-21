@@ -1,1 +1,102 @@
+package analizador;
 
+import java_cup.runtime.Symbol;
+
+parser code {:
+    public void syntax_error (Symbol s){
+        Scanner.Err += "Leve. Línea " + s.right + ", Columna " + s.left + ". Identificador " + s.value;
+    }
+    public void unrecovered_syntax_error(Symbol s){ 
+        Scanner.Err += "Grave. Línea " + s.right + ", Columna " + s.left + ". Identificador " + s.value;
+    }
+:}
+
+action code {:
+
+:}
+
+/*Terminales*/
+//AGRUPACION
+terminal String ABRIR_PARENTESIS, CERRAR_PARENTESIS, ABRIR_LLAVE, CERRAR_LLAVE, ABRIR_CORCHETE, CERRAR_CORCHETE, ABRIR_INTERROGACION, CERRAR_INTERROGACION;
+//SIGNOS VARIOS
+terminal String IGUAL, COLON, SEMICOLON, COMA;
+//SIGNOS DE OPERACIÓN
+terminal String MAS, MENOS, PRODUCTO, DIVISION;
+//VARIABLES
+terminal String DEFINIR, STRING,INT;
+//LETRAS Y NUMEROS
+terminal String CADENA, IDENTIFICADOR, ENTERO;
+//GRAFICAS
+terminal String GRAFICABARRAS, GRAFICALINEAS;
+//GRAFICABARRAS
+terminal String ID, TITULO, TITULOX, TITULOY, EJEX, EJEY, PUNTOSXY;
+//GRAFICALINEAS
+terminal String DEFINIRXYLINE, NOMBRE, COLOR, GROSOR, PUNTOS;
+//GALERIA
+terminal String GALERIA;
+/*No Terminales*/
+non terminal String INICIO;
+//A, E
+non terminal String A, E;
+//BODYS, GraficaBarras, Grafica Lineas, Galeria
+non terminal String  BODY, GB, GL, GG;
+//GraficaBarras B (BODYBARRAS), L (LABELS), EJX (EJEX), EJY (EJEY), PXY (PUNTOSXY)
+non terminal String B, L, EJX, EJY, PXY;
+//GraficaLineas C (BODYLINEAS), LL (LABELS), XYL (DEFINIRXYLINE), PXYL (PUNTOSXYL)
+non terminal String C, LL, XYL, PXYL;
+//Galeria G(BODYGALERAS), DIR (DIRECCION), GID (GRAFICASID)
+non terminal String G, DIR , GID;
+non terminal SUBINICIO;
+/*Precedencia*/
+precedence left MAS, MENOS;
+precedence left PRODUCTO, DIVISION;
+/*GRAMATICA*/
+start with INICIO;
+
+///----------------------------------------------------------
+INICIO::= DEFINIR:a ABRIR_LLAVE A:b CERRAR_LLAVE //BODY:c GG:d
+{:
+    System.out.println( (RESULT=a+"{"+b+"}" /*+ c + d*/) );
+:};
+///----------------------------------------------------------
+A::= A:a STRING IDENTIFICADOR:b IGUAL CADENA:c SEMICOLON
+{:
+    System.out.println( (RESULT=a+"\n"+"string "+b+" = "+c+";") );
+:} 
+| A:a INT IDENTIFICADOR:b IGUAL E:c SEMICOLON
+{:
+    System.out.println( (RESULT=a+"\n"+"int "+b+" = "+c+";") );
+:}
+| STRING IDENTIFICADOR:b IGUAL CADENA:c SEMICOLON
+{:
+    System.out.println( (RESULT="string "+b+" = "+c+";") );
+:} 
+| INT IDENTIFICADOR:b IGUAL E:c SEMICOLON
+{:
+    System.out.println( (RESULT="int "+b+" = "+c+";") );
+:};
+//----------------------------------------------------------
+E::= E:a MAS E:b
+{:
+    System.out.println( (RESULT=a+"+"+b) );
+:}
+| E:a PRODUCTO E:b
+{:
+    System.out.println( (RESULT=a+"*"+b) );
+:}
+| E:a MENOS E:b
+{:
+    System.out.println( (RESULT=a+"-"+b) );
+:}
+| E:a DIVISION E:b
+{:
+    System.out.println( (RESULT=a+"/"+b) );
+:}
+| ABRIR_PARENTESIS E:a CERRAR_PARENTESIS
+{:
+    RESULT = "("+a+")";
+:}
+| ENTERO:a 
+{:
+    RESULT = a;
+:};
