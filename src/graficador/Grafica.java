@@ -11,5 +11,5 @@ import org.jfree.chart.JFreeChart;
  */
 public interface Grafica {
     JFreeChart graficar();
-    
+    String getId();
 }

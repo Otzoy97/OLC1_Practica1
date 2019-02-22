@@ -34,6 +34,12 @@ public class Lineas implements Grafica{
         this.tituloy = tituloy;
         this.lineas = lineas;
     }
+    
+    @Override
+    public String getId(){
+        return this.id;
+    }
+    
     /**
      * Construye la grafica de barras obteniendo los valores 
      * @return 

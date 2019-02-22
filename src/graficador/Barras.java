@@ -35,11 +35,23 @@ public class Barras implements Grafica {
     }
     
     @Override
+    public String getId(){
+        return this.id;
+    }
+    
+    /**
+     * Construye la gráfica de barras utilizando los atributos de la clase
+     * @return 
+     */
+    @Override
     public JFreeChart graficar(){
+        //Instancia un set de datos
         DefaultCategoryDataset data =  new DefaultCategoryDataset();
+        //Procede a agregar los valores (x,y)
         puntoxsy.entrySet().forEach((e) -> {
             data.addValue(this.ejeY.get(e.getValue()), this.ejeX.get(e.getValue()), this.ejeX.get(e.getValue()));
         });
+        //Devuelve el gráfico
         return ChartFactory.createBarChart(nombre, titulox, tituloy, data, PlotOrientation.VERTICAL, true, true, false);         
     }
 }
