@@ -344,10 +344,10 @@ public class parser extends java_cup.runtime.lr_parser {
 
     /*Errores*/
     public void syntax_error (Symbol s){
-        Scanner.Err += "Leve. Línea: " + s.right + ", Columna: " + s.left + ". Identificador: " + s.value + "\n";
+        Scanner.Err += "Leve. Línea: " + s.right + ", Columna: " + s.left + ". Identificador: " + s.value + "<br/>";
     }
     public void unrecovered_syntax_error(Symbol s){ 
-        Scanner.Err += "Grave. Línea: " + s.right + ", Columna: " + s.left + ". Identificador: " + s.value +"\n";
+        Scanner.Err += "Grave. Línea: " + s.right + ", Columna: " + s.left + ". Identificador: " + s.value +"<br/>";
     }
     /**
      * @param idVar identificador de la variable buscar

@@ -395,7 +395,7 @@ public class Scanner implements java_cup.runtime.Scanner {
   private int zzFinalHighSurrogate = 0;
 
   /* user code: */
-    public static String Err ="";
+    public static String Err ="<h4>Errores léxicos</h4>";
 
 
   /**
@@ -784,7 +784,7 @@ public class Scanner implements java_cup.runtime.Scanner {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
-            { Err += "Lexema " + yytext() + ", Línea " + yyline + ", Columna " + yychar + "\n";
+            { Err += "Lexema " + yytext() + ", Línea " + yyline + ", Columna " + yychar + "<br/>";
     System.out.println(Err);
             } 
             // fall through

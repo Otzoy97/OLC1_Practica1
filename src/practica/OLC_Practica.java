@@ -5,7 +5,6 @@
  */
 package practica;
 
-import analizador.Scanner;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -19,8 +18,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import analizador.Scanner;
 import analizador.parser;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.awt.Desktop;
 import org.jfree.chart.ChartUtilities;
 /**
  *
@@ -31,6 +29,7 @@ public class OLC_Practica extends javax.swing.JFrame {
     private String nameFile;
     JFileChooser jchoose = new JFileChooser();
     JFileChooser jsave = new JFileChooser();
+    File errores = null;
     //Scanner scan = null;
     ///parser pr = null;
     /**
@@ -58,7 +57,8 @@ public class OLC_Practica extends javax.swing.JFrame {
         itemAbrir = new javax.swing.JMenuItem();
         itemGuardar = new javax.swing.JMenuItem();
         itemGuardarC = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        itemErrores = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(800, 600));
@@ -117,24 +117,35 @@ public class OLC_Practica extends javax.swing.JFrame {
             }
         });
         jMenu1.add(itemGuardarC);
+        jMenu1.add(jSeparator1);
+
+        itemErrores.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK));
+        itemErrores.setText("Reporte de Errores");
+        itemErrores.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemErroresActionPerformed(evt);
+            }
+        });
+        jMenu1.add(itemErrores);
 
         jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Reporte de errores");
-        jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    
+    
     private void btnAnalizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnalizarActionPerformed
         // TODO add your handling code here:
         Scanner scan = new analizador.Scanner(new BufferedReader(new StringReader(this.jTextArea1.getText())));
         parser pr = new analizador.parser(scan);
         try {
+            Scanner.Err +="<h4>Errores sintácticos</h4>";
             pr.parse();
             generarGaleria(pr);
+            this.makeErrores(Scanner.Err);
         } catch (Exception ex) {
             showMessageDialog(this, ex.getMessage() + " " + ex.getLocalizedMessage() + " " , "[OLC1] Practica 1 - Parser", JOptionPane.ERROR_MESSAGE);
         } finally {
@@ -197,6 +208,15 @@ public class OLC_Practica extends javax.swing.JFrame {
         // TODO add your handling code here:
         this.guardarComo();
     }//GEN-LAST:event_itemGuardarCActionPerformed
+
+    private void itemErroresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemErroresActionPerformed
+        // TODO add your handling code here:
+        try{
+            Desktop.getDesktop().open(errores);
+        } catch(IOException ex){
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "[OLC1] - Practica 1", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_itemErroresActionPerformed
     /**
      * Guarda un nuevo archivo .gu
      */
@@ -285,6 +305,26 @@ public class OLC_Practica extends javax.swing.JFrame {
         });
     }
     
+    private void makeErrores(String ERR){
+            FileWriter fileWriter = null;
+            BufferedWriter bfWriter = null;
+            try {
+                this.errores = new File("ReporteErrores.html");
+                fileWriter = new FileWriter(this.errores);
+                bfWriter = new BufferedWriter(fileWriter);
+                bfWriter.write("<html><head> <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /> <title>Reporte de errores sintáctico y léxicos</title></head><body>"+ERR+"<body></html>");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Ocurrió un error al escribir el archivo.\n"+ex.getMessage(), "[OLC1] - Practica 1", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                try {
+                    bfWriter.close();
+                    fileWriter.close();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), "[OLC1] - Practica 1", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -323,12 +363,13 @@ public class OLC_Practica extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAnalizar;
     private javax.swing.JMenuItem itemAbrir;
+    private javax.swing.JMenuItem itemErrores;
     private javax.swing.JMenuItem itemGuardar;
     private javax.swing.JMenuItem itemGuardarC;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
 }
