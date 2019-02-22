@@ -4,20 +4,23 @@
  * and open the template in the editor.
  */
 package graficador;
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.util.HashMap;
 /**
  *
  * @author otzoy
  */
 public class XYLine {
-    private String nombre , color;
-    private int grosor;
+    private String nombre;
+    private Color color;
+    private BasicStroke grosor;
     private HashMap<Integer,Integer> puntos;
     
     public XYLine (String nombre, String color, int grosor, HashMap<Integer,Integer> puntos){
         this.nombre = nombre;
-        this.color = color;
-        this.grosor = grosor;
+        this.color = matchColor(color);
+        this.grosor = new BasicStroke(grosor);
         this.puntos = puntos;
     }
 
@@ -25,33 +28,38 @@ public class XYLine {
         return nombre;
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
-    public int getGrosor() {
+    public BasicStroke getGrosor() {
         return grosor;
     }
 
     public HashMap<Integer, Integer> getPuntos() {
         return puntos;
+    }   
+    /**
+     * Devuelve un color según el string de entrada
+     * @param color
+     * @return 
+     */
+    public Color matchColor(String color){
+        switch(color){
+            case "amarillo":
+                return Color.YELLOW;
+            case "verde":
+                return Color.GREEN;
+            case "azul":
+                return Color.BLUE;
+            case "negro":
+                return Color.BLACK;
+            case "rojo":
+                return Color.RED;
+            case "naranja":
+                return Color.ORANGE;
+            default:
+                return Color.GRAY;
+        }
     }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public void setGrosor(int grosor) {
-        this.grosor = grosor;
-    }
-
-    public void setPuntos(HashMap<Integer, Integer> puntos) {
-        this.puntos = puntos;
-    }
-    
-    
 }
