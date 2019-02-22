@@ -20,7 +20,7 @@ parser code {:
     public HashMap<Integer,Integer> puntosxy_ = null;
 
     /*Gráfica Líneas*/
-    public LinkedList<XYLine> xylines_ = null;
+    public LinkedList<XYLine> xylines_ = new LinkedList();
     /*Lineas de grafica de lineas :v*/
     //private XYLine xyline_ = null;
     public String nombreLinea, colorLinea;
@@ -32,10 +32,10 @@ parser code {:
 
     /*Errores*/
     public void syntax_error (Symbol s){
-        Scanner.Err += "Leve. Línea " + s.right + ", Columna " + s.left + ". Identificador " + s.value + "\n";
+        Scanner.Err += "Leve. Línea: " + s.right + ", Columna: " + s.left + ". Identificador: " + s.value + "\n";
     }
     public void unrecovered_syntax_error(Symbol s){ 
-        Scanner.Err += "Grave. Línea " + s.right + ", Columna " + s.left + ". Identificador " + s.value +"\n";
+        Scanner.Err += "Grave. Línea: " + s.right + ", Columna: " + s.left + ". Identificador: " + s.value +"\n";
     }
     /**
      * @param idVar identificador de la variable buscar
@@ -100,7 +100,7 @@ non terminal String GRAPHBAR, GRAPHLINE, GALGAL;
 non terminal String BODYBARRAS, EJX, EJY, PXY;
 non terminal String SUBBODYBARRAS, GBVARSTR, GBVARINT;
 //GraficaLineas C (BODYLINEAS), LL (LABELS), XYL (DEFINIRXYLINE), PXYL (PUNTOSXYL)
-non terminal String BODYLINEAS, XYL, SUBXYL, PXYL;
+non terminal String BODYLINEAS, XYL, SUBXYL,PREXYL, PXYL;
 non terminal String SUBBODYLINEAS, GLVARSTR, GLVARINT;
 //Galeria G(BODYGALERAS), DIR (DIRECCION), GID (GRAFICASID)
 non terminal String GAL, DIR , GID, SUBGID;
@@ -252,7 +252,7 @@ GBVARSTR::= IDENTIFICADOR:a
 :}
 | CADENA:a
 {:
-    RESULT = a;
+    RESULT = a.substring(1,a.length()-1);
 :};
 ///CADENA O VARIABLE
 GBVARINT::= IDENTIFICADOR:a
@@ -267,6 +267,7 @@ GBVARINT::= IDENTIFICADOR:a
 GRAPHLINE::= GRAFICALINEAS ABRIR_LLAVE BODYLINEAS CERRAR_LLAVE
 {:
     listaGrafica.add(new Lineas(id_,nombre_,titulox_,tituloy_,xylines_));
+    xylines_ = new LinkedList();
 :};
 ///CUERPO PRINCIPAL
 BODYLINEAS::= BODYLINEAS SUBBODYLINEAS
@@ -290,17 +291,16 @@ SUBBODYLINEAS::= ID COLON GLVARSTR:a SEMICOLON
 {:
     tituloy_ = a;
 :}
-| DEFINIRXYLINE ABRIR_INTERROGACION XYL CERRAR_INTERROGACION
+| DEFINIRXYLINE ABRIR_INTERROGACION PREXYL CERRAR_INTERROGACION
 {::};
 //XYL
-XYL::= XYL SUBXYL
-{:
+PREXYL::= XYL{:
     xylines_.add(new XYLine(nombreLinea, colorLinea, grosorLinea, pxyline));
-:}
+:};
+XYL::= XYL SUBXYL
+{::}
 | SUBXYL
 {:
-    xylines_ = new LinkedList();
-    xylines_.add(new XYLine(nombreLinea, colorLinea, grosorLinea, pxyline));
 :};
 SUBXYL::= NOMBRE COLON GLVARSTR:a SEMICOLON
 {:
@@ -349,7 +349,7 @@ GLVARSTR::= IDENTIFICADOR:a
 :}
 | CADENA:a
 {:
-    RESULT = a;
+    RESULT = a.substring(1,a.length()-1);
 :};
 ///--------------------- GALERIA ----------------------
 GALGAL::= GALERIA ABRIR_LLAVE GAL CERRAR_LLAVE
@@ -364,7 +364,7 @@ GAL::= GAL GALERIA ABRIR_PARENTESIS DIR:a COMA GID CERRAR_PARENTESIS SEMICOLON
 :};
 DIR::= CADENA:a
 {:
-    RESULT = a;
+    RESULT = a.substring(1,a.length()-1);
 :}
 | IDENTIFICADOR:a
 {:
@@ -382,7 +382,7 @@ GID::= GID COMA SUBGID:b
 :};
 SUBGID::= CADENA:a
 {:
-    RESULT = a;
+    RESULT = a.substring(1,a.length()-1);
 :}
 | IDENTIFICADOR:a
 {:
