@@ -18,6 +18,17 @@ public class Barras implements Grafica {
     private Queue<Integer> ejeY;
     private HashMap<Integer,Integer> puntoxsy;
 
+    public Barras(String id, String nombre, String titulox, String tituloy, Queue<String> ejeX, Queue<Integer> ejeY, HashMap<Integer, Integer> puntoxsy) {
+        this.id = id;
+        this.nombre = nombre;
+        this.titulox = titulox;
+        this.tituloy = tituloy;
+        this.ejeX = ejeX;
+        this.ejeY = ejeY;
+        this.puntoxsy = puntoxsy;
+    }
+
+    
     @Override
     public JFreeChart graficar(){
         

@@ -15,6 +15,18 @@ import org.jfree.chart.JFreeChart;
 public class Lineas implements Grafica{
     private String id, nombre, titulox, tituloy;
     private Queue<XYLine> lineas;
+
+    public Lineas(String id, String nombre, String titulox, String tituloy, Queue<XYLine> lineas) {
+        this.id = id;
+        this.nombre = nombre;
+        this.titulox = titulox;
+        this.tituloy = tituloy;
+        this.lineas = lineas;
+    }
+    
+    
+    
+    
     @Override
     public JFreeChart graficar(){
 
