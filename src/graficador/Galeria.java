@@ -12,19 +12,18 @@ import java.util.LinkedList;
  */
 public class Galeria {
     private String carpeta;
-    private Queue<String> graficas;
+    private LinkedList<String> graficas;
     /**
      * 
      * @param carpeta
      * @param graficas 
      */
-    public Galeria(String carpeta, Queue<String> graficas) {
+    public Galeria(String carpeta, LinkedList<String> graficas) {
         this.carpeta = carpeta;
         this.graficas = graficas;
         
     }
     
-
     public String getCarpeta() {
         return carpeta;
     }
