@@ -1,19 +1,39 @@
 package analizador;
 
 import java_cup.runtime.Symbol;
-import graficador.Variable;
-import java.util.LinkedList;
+import graficador.*;
+import java.util.ArrayList;
+import java.util.Queue;
 
 parser code {:
-    public LinkedList<Variable> listaVariable = new LinkedList();
-    public LinkedList<Grafica> listaGrafica = new LinkedList();
-    public Linkedist<Galeria> listaGaleria = new LinkedList();
+    public ArrayList<Variable> listaVariable = new ArrayList();
+    public ArrayList<Grafica> listaGrafica = new ArrayList();
+    public ArrayList<Galeria> listaGaleria = new ArrayList();
 
+    /*Grafica*/
+    private String id_, nombre_, titulox_, tituloy_;
+    /*Grafica Barras*/
+    private Queue<String> ejeX_ = null;
+    private Queue<Integer> ejeY_ = null;
+    private HashMap<Integer,Integer> puntosxy_ = null;
+
+    /*Gráfica Líneas*/
+    private Queue<XYLine> xylines_ = null;
+    /*Lineas de grafica de lineas :v*/
+    //private XYLine xyline_ = null;
+    private String nombreLinea, colorLinea;
+    private int grosorLinea;
+    private HashMap<Integer,Integer> pxyline = null;
+    /*Galeria*/
+    private String carpeta;
+    private Queue <String> nombreGraficas;
+
+    /*Errores*/
     public void syntax_error (Symbol s){
-        Scanner.Err += "Leve. Línea " + s.right + ", Columna " + s.left + ". Identificador " + s.value;
+        Scanner.Err += "Leve. Línea " + s.right + ", Columna " + s.left + ". Identificador " + s.value + "\n";
     }
     public void unrecovered_syntax_error(Symbol s){ 
-        Scanner.Err += "Grave. Línea " + s.right + ", Columna " + s.left + ". Identificador " + s.value;
+        Scanner.Err += "Grave. Línea " + s.right + ", Columna " + s.left + ". Identificador " + s.value +"\n";
     }
     /**
      * @param idVar identificador de la variable buscar
@@ -78,10 +98,9 @@ non terminal String GRAPHBAR, GRPAHLINE, GALGAL;
 //GraficaBarras B (BODYBARRAS), L (LABELS), EJX (EJEX), EJY (EJEY), PXY (PUNTOSXY)
 non terminal String BODYBARRAS, EJX, EJY, PXY;
 non terminal String SUBBODYBARRAS, GBVARSTR, GBVARINT;
-non terminal String SUBPXY;
 //GraficaLineas C (BODYLINEAS), LL (LABELS), XYL (DEFINIRXYLINE), PXYL (PUNTOSXYL)
 non terminal String BODYLINEAS, LABELLINEAS, XYL, PXYL;
-non terminal String SUBBODYLINEAS, GLVARSTR, GLVARINT, SUBPXYL;
+non terminal String SUBBODYLINEAS, GLVARSTR, GLVARINT;
 //Galeria G(BODYGALERAS), DIR (DIRECCION), GID (GRAFICASID)
 non terminal String GAL, DIR , GID, SUBGID;
 //non terminal SUBINICIO;
@@ -146,39 +165,32 @@ DEFOPER::= DEFOPER:a MAS DEFOPER:b
 :};
 ///-----------------CUERPO DEL PROGRAMA------------------------
 BODY::= BODY SUBBODY
-{:
-:}
-| SUBBODY 
-{:
-:};
+{::}
+| SUBBODY
+{::};
 SUBBODY::= GRAPHBAR
-{:
-:}
-| GRAPHLINE 
-{:
-:};
+{::}
+| GRAPHLINE
+{::};
 ///----------------------GRAFICO DE BARRAS----------------------
 GRAPHBAR::= GRAFICABARRAS ABRIR_LLAVE BODYBARRAS CERRAR_LLAVE
-{:
-:};
+{::};
 ///CUERPO PRINCIPAL
-BODYBARRAS::= BODYBARRAS:a SUBBODYBARRAS:a
-{:
-:}
+BODYBARRAS::= BODYBARRAS SUBBODYBARRAS:b
+{::}
 | SUBBODYBARRAS:a
-{:
-:};
+{::};
 ///INSTRUCCIONES OBLIGATORIAS
-SUBBODYBARRAS::= ID COLON GBVARSTR:a SEMICOLON 
+SUBBODYBARRAS::= ID:b COLON GBVARSTR:a SEMICOLON 
 {:
 :}
-| TITULO COLON GBVARSTR:a SEMICOLON 
+| TITULO:b COLON GBVARSTR:a SEMICOLON 
 {:
 :}
-| TITULOX COLON GBVARSTR:a SEMICOLON 
+| TITULOX:b COLON GBVARSTR:a SEMICOLON 
 {:
 :}
-| TITULOY COLON GBVARSTR:a SEMICOLON 
+| TITULOY:b COLON GBVARSTR:a SEMICOLON 
 {:
 :}
 | EJEY COLON ABRIR_CORCHETE EJY:a CERRAR_CORCHETE SEMICOLON
@@ -193,27 +205,41 @@ SUBBODYBARRAS::= ID COLON GBVARSTR:a SEMICOLON
 ///EJE Y
 EJY::= EJY:a COMA GBVARINT:b
 {:
+    Double dob01 = Double.parseDouble(a);
+    ejeX_.add(dob01.intValue());
 :}
 | GBVARINT:a
 {:
+    Double dob01 = Double.parseDouble(a);
+    ejeX_ = new LinkedList();
+    ejeX_.add(dob01.intValue());
 :};
 //EJE X
-EJX::=EJX:a COMA GBVARSTR:b
+EJX::=EJX COMA GBVARSTR:a
 {:
+    Double dob01 = Double.parseDouble(a);
+    ejeY_.add(dob01.intValue());
 :}
 | GBVARSTR:a
 {:
+    Double dob01 = Double.parseDouble(a);
+    ejeY_ = new LinkedList();
+    ejeY_.add(dob01.intValue());
 :};
 ///PUNTOS XY
-PXY::= PXY:a COMA SUBPXY:b
+PXY::= PXY COMA ABRIR_LLAVE GBVARINT:a COMA GBVARINT:a CERRAR_LLAVE
 {:
+    Double dob01 = Double.parseDouble(a);
+    Double dob02 = Double.parseDouble(b);
+    puntosxy_.put(dob01.intValue(),dob02.intValue());
 :}
-| SUBPXY
+| ABRIR_LLAVE GBVARINT:a COMA GBVARINT:a CERRAR_LLAVE
 {:
+    Double dob01 = Double.parseDouble(a);
+    Double dob02 = Double.parseDouble(b);
+    puntosxy_ = new HashMap();
+    puntosxy_.put(dob01.intValue(),dob02.intValue());
 :};
-SUBPXY::= ABRIR_LLAVE GBVARINT:a COMA GBVARINT:a CERRAR_LLAVE
-{:
-:}
 ///ENTERO O VARIABLE
 GBVARSTR::= IDENTIFICADOR:a
 {:
@@ -226,72 +252,85 @@ GBVARSTR::= IDENTIFICADOR:a
 ///CADENA O VARIABLE
 GBVARINT::= IDENTIFICADOR:a
 {:
-    RESULT = getCifra(a);
+    RESULT = getCifra(a)+"";
 :}
 | DEFOPER:a
 {:
     RESULT = a;
 :};
 ///---------------------GRAFICO DE LINEAS ----------------------
-GRAPHLINE::= GRAFICALINEAS ABRIR_LLAVE BODYLINEAS:a CERRAR_LLAVE
+GRAPHLINE::= GRAFICALINEAS ABRIR_LLAVE BODYLINEAS CERRAR_LLAVE
 {:
+    listaGrafica.add(new Lineas(id_,nombre_,titulox_,tituloy_,xylines_));
 :};
 ///CUERPO PRINCIPAL
-BODYLINEAS::= BODYLINEAS:a SUBBODYLINEAS:b
-{:
-:}
-| SUBBODYLINEAS:a
-{:
-:};
+BODYLINEAS::= BODYLINEAS SUBBODYLINEAS
+{::}
+| SUBBODYLINEAS
+{::};
 ///INSTRUCCIONES OBLIGATORIAS
 SUBBODYLINEAS::= ID COLON GLVARSTR:a SEMICOLON 
 {:
+    id_ = a;
 :}
 | TITULO COLON GLVARSTR:a SEMICOLON 
 {:
+    nombre_ = a;
 :}
 | TITULOX COLON GLVARSTR:a SEMICOLON
 {:
+    titulox_ = a;
 :}
 | TITULOY COLON GLVARSTR:a SEMICOLON
 {:
+    tituloy_ = a;
 :}
-| DEFINIRXYLINE ABRIR_INTERROGACION XYL:a CERRAR_INTERROGACION
+| DEFINIRXYLINE ABRIR_INTERROGACION XYL CERRAR_INTERROGACION
+{::};
+//XYL
+XYL::= XYL SUBXYL
 {:
-:};
-////XYL
-XYL::= XYL:a SUBXYL:b
-{:
+    xylines_.add(new XYLine(nombreLinea, colorLinea, grosorLinea, pxyline));
 :}
-| SUBXYL:a
+| SUBXYL
 {:
+    xylines_ = new LinkedList();
+    xylines_.add(new XYLine(nombreLinea, colorLinea, grosorLinea, pxyline));
 :};
 SUBXYL::= NOMBRE COLON GLVARSTR:a SEMICOLON
 {:
+    nombreLinea = a;
 :}
 | COLOR COLON GLVARSTR:a SEMICOLON
 {:
+    colorLinea = a;
 :}
 | GROSOR COLON GLVARINT:a SEMICOLON 
 {:
+    grosorLinea = a;
 :}
-| PUNTOS COLON ABRIR_CORCHETE PXYL:a CERRAR_CORCHETE SEMICOLON
-{:
-:};
+| PUNTOS COLON ABRIR_CORCHETE PXYL CERRAR_CORCHETE SEMICOLON
+{::};
 ///PXYL
-PXYL::= PXYL:a COMA SUBPXYL:b
+PXYL::= PXYL COMA ABRIR_LLAVE GLVARINT:a COMA GLVARINT:b CERRAR_LLAVE
 {:
+    Double dob01 = Double.parseDouble(a);
+    Double dob02 = Double.parseDouble(b);
+
+    pxyline.put(dob01.intValue(),dob02.intValue());
 :}
-| SUBPXYL:a
+| ABRIR_LLAVE GLVARINT:a COMA GLVARINT:b CERRAR_LLAVE
 {:
-:};
-SUBPXYL::= ABRIR_LLAVE GLVARINT:a COMA GLVARINT:b CERRAR_LLAVE
-{:
+    Double dob01 = Double.parseDouble(a);
+    Double dob02 = Double.parseDouble(b);
+
+    pxyline = new HashMap();
+    pxyline.put(dob01.intValue(),dob02.intValue());
 :};
 //GLVARINT
 GLVARINT::= IDENTIFICADOR:a
 {:
-    RESULT = getCifra(a);
+    RESULT = getCifra(a)+"";
 :}
 | DEFOPER:a 
 {:
@@ -307,14 +346,15 @@ GLVARSTR::= IDENTIFICADOR:a
     RESULT = a;
 :};
 ///--------------------- GALERIA ----------------------
-GALGAL::= GALERIA ABRIR_LLAVE GAL:a CERRAR_LLAVE
+GALGAL::= GALERIA ABRIR_LLAVE GAL CERRAR_LLAVE
+{::};
+GAL::= GAL GALERIA ABRIR_PARENTESIS DIR:a COMA GID CERRAR_PARENTESIS SEMICOLON
 {:
-:};
-GAL::= GAL:a GALERIA ABRIR_PARENTESIS DIR:b COMA GID:c CERRAR_PARENTESIS SEMICOLON
-{:
+    listaGaleria.add(new Galeria(a,nombreGraficas));
 :}
-| GALERIA ABRIR_PARENTESIS SUBGAL:a CERRAR_PARENTESIS SEMICOLON
+| GALERIA ABRIR_PARENTESIS DIR:a COMA GID CERRAR_PARENTESIS SEMICOLON
 {:
+    listaGaleria.add(new Galeria(a,nombreGraficas));
 :};
 DIR::= CADENA:a
 {:
@@ -324,11 +364,15 @@ DIR::= CADENA:a
 {:
     RESULT = getString(a);
 :};
-GID::= GID:a COMA SUBGID:b
+GID::= GID COMA SUBGID:b
 {:
+    nombreGraficas.add(b);
 :}
 | SUBGID:a
 {:
+    nombreGraficas = new LinkedList();
+    nombreGraficas.add(a);
+    RESULT = a; 
 :};
 SUBGID:: = CADENA:a
 {:
