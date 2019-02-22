@@ -5,6 +5,7 @@
  */
 package graficador;
 
+import java.util.Queue;
 import org.jfree.chart.JFreeChart;
 
 /**
@@ -13,9 +14,10 @@ import org.jfree.chart.JFreeChart;
  */
 public class Lineas implements Grafica{
     private String id, nombre, titulox, tituloy;
-    
+    private Queue<XYLine> lineas;
     @Override
     public JFreeChart graficar(){
+
         return null;
     }
 }

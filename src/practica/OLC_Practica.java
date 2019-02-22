@@ -5,10 +5,12 @@
  */
 package practica;
 
+import analizador.Scanner;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
+import java.util.LinkedList;
 
 /**
  *
@@ -77,14 +79,34 @@ public class OLC_Practica extends javax.swing.JFrame {
         analizador.parser pr = new analizador.parser(scan);
         try {
             pr.parse();
+            pr.listaVariable.forEach((var) -> {
+                System.out.println("tipo " + var.getTipo() + " id " + var.getNombre() + " value " + (var.getTipo().equals("string") ? var.getTexto() : var.getCifra()));    
+                
+            });
         } catch (Exception ex) {
             showMessageDialog(this, ex.getMessage(), "Tarea 2", JOptionPane.ERROR_MESSAGE);
         } finally {
-            System.out.println(scan.Err);
+            System.out.println(Scanner.Err);
+            
         }
-        scan.Err = "";
+        Scanner.Err = "";
     }//GEN-LAST:event_jButton1ActionPerformed
-
+    /**
+     * 
+     * @param id
+     * @return 
+     */
+    public String getTexto(String id){
+        LinkedList<String> aux = new LinkedList();
+        aux.add("AA");aux.add("AB");aux.add("AC");aux.add("AD");aux.add("AE");
+        for(String var : aux){
+            if(var.equals(id)){
+                break;
+            }
+        }
+        return null;
+    }
+    
     /**
      * @param args the command line arguments
      */

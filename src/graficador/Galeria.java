@@ -31,8 +31,7 @@ public class Galeria {
 
     public Queue<String> getGraficas() {
         return graficas;
-    }
-    
+    }      
     
     
 }
