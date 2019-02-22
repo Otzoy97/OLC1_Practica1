@@ -322,22 +322,22 @@ public class parser extends java_cup.runtime.lr_parser {
     public ArrayList<Galeria> listaGaleria = new ArrayList();
 
     /*Grafica*/
-    private String id_, nombre_, titulox_, tituloy_;
+    public String id_, nombre_, titulox_, tituloy_;
     /*Grafica Barras*/
-    private Queue<String> ejeX_ = null;
-    private Queue<Integer> ejeY_ = null;
-    private HashMap<Integer,Integer> puntosxy_ = null;
+    public Queue<String> ejeX_ = null;
+    public Queue<Integer> ejeY_ = null;
+    public HashMap<Integer,Integer> puntosxy_ = null;
 
     /*Gráfica Líneas*/
-    private Queue<XYLine> xylines_ = null;
+    public Queue<XYLine> xylines_ = null;
     /*Lineas de grafica de lineas :v*/
     //private XYLine xyline_ = null;
-    private String nombreLinea, colorLinea;
-    private int grosorLinea;
-    private HashMap<Integer,Integer> pxyline = null;
+    public String nombreLinea, colorLinea;
+    public int grosorLinea;
+    public HashMap<Integer,Integer> pxyline = null;
     /*Galeria*/
-    private String carpeta;
-    private Queue <String> nombreGraficas;
+    public String carpeta;
+    public Queue <String> nombreGraficas;
 
     /*Errores*/
     public void syntax_error (Symbol s){
