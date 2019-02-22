@@ -9,16 +9,12 @@ import analizador.Scanner;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
-import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -132,10 +128,7 @@ public class OLC_Practica extends javax.swing.JFrame {
         analizador.parser pr = new analizador.parser(scan);
         try {
             pr.parse();
-            pr.listaVariable.forEach((var) -> {
-                System.out.println("tipo " + var.getTipo() + " id " + var.getNombre() + " value " + (var.getTipo().equals("string") ? var.getTexto() : var.getCifra()));    
-                
-            });
+
         } catch (Exception ex) {
             showMessageDialog(this, ex.getMessage(), "Tarea 2", JOptionPane.ERROR_MESSAGE);
         } finally {
@@ -156,19 +149,17 @@ public class OLC_Practica extends javax.swing.JFrame {
         if (resultChoose== JFileChooser.APPROVE_OPTION) {
             this.nameFile = jchoose.getSelectedFile().getAbsolutePath();
             String nombreArchivo = jchoose.getSelectedFile().getName();
+            String linea,output = "";
             try {
-                byte[] buffer = new byte[1024];
-                String output;
-                try (FileInputStream strFile = new FileInputStream(nameFile)) {
-                    int nRead;
-                    output = "";
-                    while((nRead = strFile.read(buffer)) != -1){
-                        output += new String(buffer);
+                FileReader fileReader = new FileReader(nameFile);
+                try (BufferedReader bfReader = new BufferedReader(fileReader)) {
+                    while((linea=bfReader.readLine())!=null){
+                        output+=linea + "\n";
                     }
+                    this.setTitle("[OLC1] - Practica 1 : "+nombreArchivo);
+                    this.jTextArea1.setText(output);
+                    jchoose.setCurrentDirectory(new File(nameFile));
                 }
-                this.jTextArea1.setText(output);
-                this.setTitle("[OLC1] - Practica 1 : "+nombreArchivo);
-                jchoose.setCurrentDirectory(new File(nameFile));
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, "Ocurrió un error al leer el archivo.\n"+ex.getMessage(), "[OLC1] - Practica 1", JOptionPane.ERROR_MESSAGE);
             }
