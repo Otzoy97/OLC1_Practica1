@@ -4,7 +4,7 @@ import java_cup.runtime.Symbol;
 %%
 
 %{
-    public static String Err = "/----- Errores léxicos -----/";
+    public static String Err ="";
 %}
 
 //directivas

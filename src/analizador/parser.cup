@@ -15,12 +15,12 @@ parser code {:
     /*Grafica*/
     public String id_, nombre_, titulox_, tituloy_;
     /*Grafica Barras*/
-    public Queue<String> ejeX_ = null;
-    public Queue<Integer> ejeY_ = null;
+    public LinkedList<String> ejeX_ = null;
+    public LinkedList<Integer> ejeY_ = null;
     public HashMap<Integer,Integer> puntosxy_ = null;
 
     /*Gráfica Líneas*/
-    public Queue<XYLine> xylines_ = null;
+    public LinkedList<XYLine> xylines_ = null;
     /*Lineas de grafica de lineas :v*/
     //private XYLine xyline_ = null;
     public String nombreLinea, colorLinea;
@@ -28,7 +28,7 @@ parser code {:
     public HashMap<Integer,Integer> pxyline = null;
     /*Galeria*/
     public String carpeta;
-    public Queue <String> nombreGraficas;
+    public LinkedList <String> nombreGraficas;
 
     /*Errores*/
     public void syntax_error (Symbol s){
@@ -203,10 +203,10 @@ SUBBODYBARRAS::= ID COLON GBVARSTR:a SEMICOLON
 | EJEY COLON ABRIR_CORCHETE EJY CERRAR_CORCHETE SEMICOLON
 {:
 :}
-| EJEX COLON ABRIR_CORCHETE EJX CERRAR_CORCHETE 
+| EJEX COLON ABRIR_CORCHETE EJX CERRAR_CORCHETE SEMICOLON
 {:
 :}
-| PUNTOSXY COLON ABRIR_CORCHETE PXY CERRAR_CORCHETE 
+| PUNTOSXY COLON ABRIR_CORCHETE PXY CERRAR_CORCHETE SEMICOLON
 {:
 :};
 ///EJE Y
