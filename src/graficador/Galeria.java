@@ -21,7 +21,6 @@ public class Galeria {
     public Galeria(String carpeta, LinkedList<String> graficas) {
         this.carpeta = carpeta;
         this.graficas = graficas;
-        
     }
     
     public String getCarpeta() {
@@ -30,7 +29,5 @@ public class Galeria {
 
     public Queue<String> getGraficas() {
         return graficas;
-    }      
-    
-    
+    }     
 }

@@ -17,7 +17,11 @@ import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
+import analizador.Scanner;
+import analizador.parser;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jfree.chart.ChartUtilities;
 /**
  *
  * @author otzoy
@@ -27,6 +31,8 @@ public class OLC_Practica extends javax.swing.JFrame {
     private String nameFile;
     JFileChooser jchoose = new JFileChooser();
     JFileChooser jsave = new JFileChooser();
+    Scanner scan = null;
+    parser pr = null;
     /**
      * Creates new form OLC_Practica
      */
@@ -124,20 +130,23 @@ public class OLC_Practica extends javax.swing.JFrame {
 
     private void btnAnalizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnalizarActionPerformed
         // TODO add your handling code here:
-        analizador.Scanner scan = new analizador.Scanner(new BufferedReader(new StringReader(this.jTextArea1.getText())));
-        analizador.parser pr = new analizador.parser(scan);
+        scan = new analizador.Scanner(new BufferedReader(new StringReader(this.jTextArea1.getText())));
+        pr = new analizador.parser(scan);
         try {
             pr.parse();
-
+            generarGaleria();
         } catch (Exception ex) {
-            showMessageDialog(this, ex.getMessage(), "Tarea 2", JOptionPane.ERROR_MESSAGE);
+            showMessageDialog(this, ex.getMessage(), "[OLC1] Practica 1", JOptionPane.ERROR_MESSAGE);
         } finally {
             System.out.println(Scanner.Err);
             
         }
         Scanner.Err = "";
     }//GEN-LAST:event_btnAnalizarActionPerformed
-
+    /**
+     * 
+     * @param evt 
+     */
     private void itemAbrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemAbrirActionPerformed
         // TODO add your handling code here:
         
@@ -168,7 +177,10 @@ public class OLC_Practica extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_itemAbrirActionPerformed
-
+    /**
+     * 
+     * @param evt 
+     */
     private void itemGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemGuardarActionPerformed
         // TODO add your handling code here:
         if (!this.nameFile.isEmpty()) {
@@ -177,7 +189,10 @@ public class OLC_Practica extends javax.swing.JFrame {
             this.guardarComo();
         }
     }//GEN-LAST:event_itemGuardarActionPerformed
-
+    /**
+     * 
+     * @param evt 
+     */
     private void itemGuardarCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemGuardarCActionPerformed
         // TODO add your handling code here:
         this.guardarComo();
@@ -241,6 +256,32 @@ public class OLC_Practica extends javax.swing.JFrame {
                 }
             }
         }
+    }
+    /**
+     * Obtiene un directorio y una lista de imagenes a buscar
+     */
+    private void generarGaleria(){
+        //Recorrerá la lista de gráficas
+        pr.listaGaleria.forEach((e)->{
+            //Crea el directorio
+            File dir = new File("/"+e.getCarpeta());
+            String absPath = dir.getAbsolutePath();
+            //Recorre la lista de gráficas de gráficas
+            e.getGraficas().forEach((b)->{
+                //Buscará el id en la lista de gráficas
+                pr.listaGrafica.forEach((c)->{
+                    if (b.equals(c.getId())){
+                        try {
+                            File jpg =  new File(absPath + "/"+c.getId()+".jpeg");
+                            ChartUtilities.saveChartAsJPEG(jpg, c.graficar(), 800, 600);
+                        } catch (IOException ex) {
+                            showMessageDialog(this, ex.getMessage(), "[OLC1] Practica 1", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                });
+            });
+            
+        });
     }
     
     /**
