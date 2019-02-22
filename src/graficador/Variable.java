@@ -22,6 +22,7 @@ public class Variable {
         this.tipo = tipo;
         this.nombre = nombre;
         this.texto = texto.substring(1, texto.length()-1);
+        System.out.println(this.texto);
     }
     /**
      * 

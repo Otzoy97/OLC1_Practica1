@@ -31,8 +31,8 @@ public class OLC_Practica extends javax.swing.JFrame {
     private String nameFile;
     JFileChooser jchoose = new JFileChooser();
     JFileChooser jsave = new JFileChooser();
-    Scanner scan = null;
-    parser pr = null;
+    //Scanner scan = null;
+    ///parser pr = null;
     /**
      * Creates new form OLC_Practica
      */
@@ -130,13 +130,13 @@ public class OLC_Practica extends javax.swing.JFrame {
 
     private void btnAnalizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnalizarActionPerformed
         // TODO add your handling code here:
-        scan = new analizador.Scanner(new BufferedReader(new StringReader(this.jTextArea1.getText())));
-        pr = new analizador.parser(scan);
+        Scanner scan = new analizador.Scanner(new BufferedReader(new StringReader(this.jTextArea1.getText())));
+        parser pr = new analizador.parser(scan);
         try {
             pr.parse();
-            generarGaleria();
+            generarGaleria(pr);
         } catch (Exception ex) {
-            showMessageDialog(this, ex.getMessage(), "[OLC1] Practica 1", JOptionPane.ERROR_MESSAGE);
+            showMessageDialog(this, ex.getMessage() + " " + ex.getLocalizedMessage() + " " , "[OLC1] Practica 1 - Parser", JOptionPane.ERROR_MESSAGE);
         } finally {
             System.out.println(Scanner.Err);
             
@@ -260,11 +260,12 @@ public class OLC_Practica extends javax.swing.JFrame {
     /**
      * Obtiene un directorio y una lista de imagenes a buscar
      */
-    private void generarGaleria(){
+    private void generarGaleria(parser pr){
         //Recorrerá la lista de gráficas
         pr.listaGaleria.forEach((e)->{
             //Crea el directorio
-            File dir = new File("/"+e.getCarpeta());
+            File dir = new File(e.getCarpeta());
+            dir.mkdir();
             String absPath = dir.getAbsolutePath();
             //Recorre la lista de gráficas de gráficas
             e.getGraficas().forEach((b)->{
@@ -272,10 +273,10 @@ public class OLC_Practica extends javax.swing.JFrame {
                 pr.listaGrafica.forEach((c)->{
                     if (b.equals(c.getId())){
                         try {
-                            File jpg =  new File(absPath + "/"+c.getId()+".jpeg");
+                            File jpg =  new File(absPath + "\\"+c.getId()+".jpeg");
                             ChartUtilities.saveChartAsJPEG(jpg, c.graficar(), 800, 600);
                         } catch (IOException ex) {
-                            showMessageDialog(this, ex.getMessage(), "[OLC1] Practica 1", JOptionPane.ERROR_MESSAGE);
+                            showMessageDialog(this, ex.getMessage()+"aber pvtos", "[OLC1]8888 Practica 1", JOptionPane.ERROR_MESSAGE);
                         }
                     }
                 });

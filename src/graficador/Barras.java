@@ -49,7 +49,8 @@ public class Barras implements Grafica {
         DefaultCategoryDataset data =  new DefaultCategoryDataset();
         //Procede a agregar los valores (x,y)
         puntoxsy.entrySet().forEach((e) -> {
-            data.addValue(this.ejeY.get(e.getValue()), this.ejeX.get(e.getValue()), this.ejeX.get(e.getValue()));
+            data.addValue(this.ejeY.get(e.getValue()), this.ejeX.get(e.getKey()), this.ejeX.get(e.getKey()));
+            System.out.println(e.getValue()+ " "+ e.getKey());
         });
         //Devuelve el gráfico
         return ChartFactory.createBarChart(nombre, titulox, tituloy, data, PlotOrientation.VERTICAL, true, true, false);         

@@ -33,6 +33,7 @@ public class Lineas implements Grafica{
         this.titulox = titulox;
         this.tituloy = tituloy;
         this.lineas = lineas;
+        
     }
     
     @Override
@@ -55,6 +56,7 @@ public class Lineas implements Grafica{
         //Controla el indice de la gráfica a personalizar
         int contador=0;
         for (XYLine xyline : lineas) {
+            
             render.setSeriesPaint(contador, xyline.getColor());
             render.setSeriesStroke(contador++, xyline.getGrosor());
         }
