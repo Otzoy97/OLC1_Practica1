@@ -3,7 +3,9 @@ package analizador;
 import java_cup.runtime.Symbol;
 import graficador.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Queue;
+import java.util.HashMap;
 
 parser code {:
     public ArrayList<Variable> listaVariable = new ArrayList();
@@ -43,7 +45,7 @@ parser code {:
         double cifra = 0;
         for(Variable var : listaVariable){
             if(var.getNombre().equals(idVar)){
-                valor = var.getCifra();
+                cifra = var.getCifra();
             }
         }
         return cifra;
@@ -90,16 +92,15 @@ terminal String GALERIA;
 non terminal String INICIO;
 //Definición de variables y operatoria de enteros
 non terminal String DEFVAR, DEFOPER;
-non terminal String VARSTR, VARINT;
 //BODYS
 non terminal String  BODY, SUBBODY;
 //GraficaBarras, Grafica Lineas, Galeria
-non terminal String GRAPHBAR, GRPAHLINE, GALGAL;
+non terminal String GRAPHBAR, GRAPHLINE, GALGAL;
 //GraficaBarras B (BODYBARRAS), L (LABELS), EJX (EJEX), EJY (EJEY), PXY (PUNTOSXY)
 non terminal String BODYBARRAS, EJX, EJY, PXY;
 non terminal String SUBBODYBARRAS, GBVARSTR, GBVARINT;
 //GraficaLineas C (BODYLINEAS), LL (LABELS), XYL (DEFINIRXYLINE), PXYL (PUNTOSXYL)
-non terminal String BODYLINEAS, LABELLINEAS, XYL, PXYL;
+non terminal String BODYLINEAS, XYL, SUBXYL, PXYL;
 non terminal String SUBBODYLINEAS, GLVARSTR, GLVARINT;
 //Galeria G(BODYGALERAS), DIR (DIRECCION), GID (GRAFICASID)
 non terminal String GAL, DIR , GID, SUBGID;
@@ -111,7 +112,7 @@ precedence left PRODUCTO, DIVISION;
 start with INICIO;
 
 ///----------------------------------------------------------
-INICIO::= DEFINIR:a ABRIR_LLAVE A:b CERRAR_LLAVE BODY:c GALGAL:d
+INICIO::= DEFINIR:a ABRIR_LLAVE DEFVAR:b CERRAR_LLAVE BODY:c GALGAL:d
 {:
     //System.out.println( (RESULT=a+"{"+b+"}" /*+ c + d*/) );
 :};
@@ -122,7 +123,7 @@ DEFVAR::= DEFVAR:a STRING IDENTIFICADOR:b IGUAL CADENA:c SEMICOLON
     //RESULT = a;
     listaVariable.add(new Variable("string",b,c));
 :} 
-| DEFVAR:a INT IDENTIFICADOR:b IGUAL E:c SEMICOLON
+| DEFVAR:a INT IDENTIFICADOR:b IGUAL DEFOPER:c SEMICOLON
 {:
     //System.out.println( (RESULT=a+"\n"+"int "+b+" = "+c+";") );
     //RESULT =a;
@@ -133,7 +134,7 @@ DEFVAR::= DEFVAR:a STRING IDENTIFICADOR:b IGUAL CADENA:c SEMICOLON
     //System.out.println( (RESULT="string "+b+" = "+c+";") );
     listaVariable.add(new Variable("string",b,c));
 :} 
-| INT IDENTIFICADOR:b IGUAL E:c SEMICOLON
+| INT IDENTIFICADOR:b IGUAL DEFOPER:c SEMICOLON
 {:
     //System.out.println( (RESULT="int "+b+" = "+c+";") );
     listaVariable.add(new Variable("int",b,Double.parseDouble(c+"")));
@@ -174,66 +175,70 @@ SUBBODY::= GRAPHBAR
 {::};
 ///----------------------GRAFICO DE BARRAS----------------------
 GRAPHBAR::= GRAFICABARRAS ABRIR_LLAVE BODYBARRAS CERRAR_LLAVE
-{::};
+{:
+    listaGrafica.add(new Barras(id_,nombre_,titulox_,tituloy_,ejeX_,ejeY_,puntosxy_));
+:};
 ///CUERPO PRINCIPAL
-BODYBARRAS::= BODYBARRAS SUBBODYBARRAS:b
+BODYBARRAS::= BODYBARRAS SUBBODYBARRAS
 {::}
-| SUBBODYBARRAS:a
+| SUBBODYBARRAS
 {::};
 ///INSTRUCCIONES OBLIGATORIAS
-SUBBODYBARRAS::= ID:b COLON GBVARSTR:a SEMICOLON 
+SUBBODYBARRAS::= ID COLON GBVARSTR:a SEMICOLON 
+{:
+    id_ = a;
+:}
+| TITULO COLON GBVARSTR:a SEMICOLON 
+{:
+    nombre_ = a;
+:}
+| TITULOX COLON GBVARSTR:a SEMICOLON 
+{:
+    titulox_ = a;
+:}
+| TITULOY COLON GBVARSTR:a SEMICOLON 
+{:
+    tituloy_ = a;
+:}
+| EJEY COLON ABRIR_CORCHETE EJY CERRAR_CORCHETE SEMICOLON
 {:
 :}
-| TITULO:b COLON GBVARSTR:a SEMICOLON 
+| EJEX COLON ABRIR_CORCHETE EJX CERRAR_CORCHETE 
 {:
 :}
-| TITULOX:b COLON GBVARSTR:a SEMICOLON 
-{:
-:}
-| TITULOY:b COLON GBVARSTR:a SEMICOLON 
-{:
-:}
-| EJEY COLON ABRIR_CORCHETE EJY:a CERRAR_CORCHETE SEMICOLON
-{:
-:}
-| EJEX COLON ABRIR_CORCHETE EJX:a CERRAR_CORCHETE 
-{:
-:}
-| PUNTOSXY COLON ABRIR_CORCHETE PXY:a CERRAR_CORCHETE 
+| PUNTOSXY COLON ABRIR_CORCHETE PXY CERRAR_CORCHETE 
 {:
 :};
 ///EJE Y
-EJY::= EJY:a COMA GBVARINT:b
-{:
-    Double dob01 = Double.parseDouble(a);
-    ejeX_.add(dob01.intValue());
-:}
-| GBVARINT:a
-{:
-    Double dob01 = Double.parseDouble(a);
-    ejeX_ = new LinkedList();
-    ejeX_.add(dob01.intValue());
-:};
-//EJE X
-EJX::=EJX COMA GBVARSTR:a
+EJY::= EJY COMA GBVARINT:a
 {:
     Double dob01 = Double.parseDouble(a);
     ejeY_.add(dob01.intValue());
 :}
-| GBVARSTR:a
+| GBVARINT:a
 {:
     Double dob01 = Double.parseDouble(a);
     ejeY_ = new LinkedList();
     ejeY_.add(dob01.intValue());
 :};
+//EJE X
+EJX::=EJX COMA GBVARSTR:a
+{:
+    ejeX_.add(a);
+:}
+| GBVARSTR:a
+{:
+    ejeX_ = new LinkedList();
+    ejeX_.add(a);
+:};
 ///PUNTOS XY
-PXY::= PXY COMA ABRIR_LLAVE GBVARINT:a COMA GBVARINT:a CERRAR_LLAVE
+PXY::= PXY COMA ABRIR_LLAVE GBVARINT:a COMA GBVARINT:b CERRAR_LLAVE
 {:
     Double dob01 = Double.parseDouble(a);
     Double dob02 = Double.parseDouble(b);
     puntosxy_.put(dob01.intValue(),dob02.intValue());
 :}
-| ABRIR_LLAVE GBVARINT:a COMA GBVARINT:a CERRAR_LLAVE
+| ABRIR_LLAVE GBVARINT:a COMA GBVARINT:b CERRAR_LLAVE
 {:
     Double dob01 = Double.parseDouble(a);
     Double dob02 = Double.parseDouble(b);
@@ -252,7 +257,7 @@ GBVARSTR::= IDENTIFICADOR:a
 ///CADENA O VARIABLE
 GBVARINT::= IDENTIFICADOR:a
 {:
-    RESULT = getCifra(a)+"";
+    RESULT = getValue(a)+"";
 :}
 | DEFOPER:a
 {:
@@ -307,7 +312,8 @@ SUBXYL::= NOMBRE COLON GLVARSTR:a SEMICOLON
 :}
 | GROSOR COLON GLVARINT:a SEMICOLON 
 {:
-    grosorLinea = a;
+    Double dob01 = Double.parseDouble(a);
+    grosorLinea = dob01.intValue();
 :}
 | PUNTOS COLON ABRIR_CORCHETE PXYL CERRAR_CORCHETE SEMICOLON
 {::};
@@ -330,7 +336,7 @@ PXYL::= PXYL COMA ABRIR_LLAVE GLVARINT:a COMA GLVARINT:b CERRAR_LLAVE
 //GLVARINT
 GLVARINT::= IDENTIFICADOR:a
 {:
-    RESULT = getCifra(a)+"";
+    RESULT = getValue(a)+"";
 :}
 | DEFOPER:a 
 {:
@@ -374,7 +380,7 @@ GID::= GID COMA SUBGID:b
     nombreGraficas.add(a);
     RESULT = a; 
 :};
-SUBGID:: = CADENA:a
+SUBGID::= CADENA:a
 {:
     RESULT = a;
 :}
