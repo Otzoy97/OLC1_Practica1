@@ -31,18 +31,6 @@ Espacio = \t\f|" "|\r|\n
 
 %%
 
-
-/*
-
-definirGlobales{
-string titulo = "notas";
-int num1 = 4;
-}
-
-*/
-
-//Acciones
-
 "+" 
 {
     return new Symbol(sym.MAS, yycolumn,yyline,yytext());
